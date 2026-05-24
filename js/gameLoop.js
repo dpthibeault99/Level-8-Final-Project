@@ -5,6 +5,82 @@ var context = canvas.getContext("2d");
 var interval = 1000/60;
 var timer = setInterval(animate, interval);
 var score = 0;
+var hit = 0;
+
+var states = [];
+var currentState = 0;
+// 0 title
+// 1 game
+// 2 controls
+// 3 credits
+// 4 lose
+
+// Start Button
+var startButtonX = 412;
+var startButtonY = 250;
+var startButtonW = 200;
+var startButtonH = 70;
+
+// Controls Button
+var controlsButtonX = 412;
+var controlsButtonY = 340;
+var controlsButtonW = 200;
+var controlsButtonH = 70;
+
+// Credits Button
+var creditsButtonX = 412;
+var creditsButtonY = 430;
+var creditsButtonW = 200;
+var creditsButtonH = 70;
+
+canvas.addEventListener("click", onClicked);
+
+function onClicked(e)
+{
+    var rect = canvas.getBoundingClientRect();
+
+    var mouseX = e.clientX - rect.left;
+    var mouseY = e.clientY - rect.top;
+
+    if(currentState >=0 || currentState <= 2) // state[1] = game
+    {
+        // Start Button
+        if(
+            mouseX >= startButtonX &&
+            mouseX <= startButtonX + startButtonW &&
+            mouseY >= startButtonY &&
+            mouseY <= startButtonY + startButtonH
+        )
+        {
+            console.log("Clicked Start Button!");
+            currentState = 1;
+        }
+
+        // Controls Button
+        if(
+            mouseX >= controlsButtonX &&
+            mouseX <= controlsButtonX + controlsButtonW &&
+            mouseY >= controlsButtonY &&
+            mouseY <= controlsButtonY + controlsButtonH
+        )
+        {
+            console.log("Clicked Controls Button!");
+            currentState = 2;
+        }
+
+        // Credits Button
+        if(
+            mouseX >= creditsButtonX &&
+            mouseX <= creditsButtonX + creditsButtonW &&
+            mouseY >= creditsButtonY &&
+            mouseY <= creditsButtonY + creditsButtonH
+        )
+        {
+            console.log("Clicked Credits Button!");
+            currentState = 3;
+        }
+    }
+}
 
 var player = new gameObject(canvas.width/2, canvas.height/2, 75, 75, "#ff0000");
 var pointer = new gameObject(450, 450, 50, 100);
@@ -23,7 +99,6 @@ makeTopTargets();
 makeRightTargets();
 makeBottomTargets();
 
-
 var canShoot = true;
 var bullets = [];
 
@@ -31,10 +106,53 @@ function animate()
 {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
-    // the score
-	context.fillStyle = "#b700f4";
+    states[currentState]();
+}
+
+states[0] = function() 
+{
+    // title
+
+    context.fillStyle = "#b700f4";
     context.font = "30px Arial";
-    context.fillText("Score: "+ score, 400, 50);
+    context.fillText("Test states[0] - title", 360, 150);
+
+    // Start Button
+    context.fillStyle = "#222222";
+    context.fillRect(startButtonX, startButtonY, startButtonW, startButtonH);
+
+    context.fillStyle = "#ffffff";
+    context.font = "30px Arial";
+    context.fillText("START", startButtonX + 55, startButtonY + 45);
+
+    // Controls Button
+    context.fillStyle = "#222222";
+    context.fillRect(controlsButtonX, controlsButtonY, controlsButtonW, controlsButtonH);
+
+    context.fillStyle = "#ffffff";
+    context.font = "30px Arial";
+    context.fillText("CONTROLS", controlsButtonX + 22, controlsButtonY + 45);
+
+    // Credits Button
+    context.fillStyle = "#222222";
+    context.fillRect(creditsButtonX, creditsButtonY, creditsButtonW, creditsButtonH);
+
+    context.fillStyle = "#ffffff";
+    context.font = "30px Arial";
+    context.fillText("CREDITS", creditsButtonX + 35, creditsButtonY + 45);
+}
+
+states[1] = function()
+{
+    // game
+
+    context.fillStyle = "#b700f4";
+    context.font = "30px Arial";
+    context.fillText("Score: " + score, 400, 50);
+    context.fillText("Hit: " + hit, 550, 50);
+    console.log(hit)
+
+    context.fillText("Test states[1] - game", 400, 100);
 
     orbit();
     wasd();
@@ -42,10 +160,61 @@ function animate()
     moveBullets();
     drawTargets();
     hitTargets();
+    hitPlayer();
 
     player.drawCircle();
     pointer.drawTriangle();
     player.move();
+
+    if(hit == 55)
+    {
+        currentState = 4;
+    }
+}
+
+states[2] = function()
+{
+    // Controls
+    context.fillStyle = "#b700f4";
+    context.font = "30px Arial";
+    context.fillText("Test states[2] - controls", 360, 150);
+
+    context.font = "24px Arial";
+    context.fillText("WASD to move", 400, 250);
+    context.fillText("SPACE to shoot", 400, 300);
+}
+
+states[3] = function()
+{
+    // Credits
+    context.fillStyle = "#b700f4";
+    context.font = "30px Arial";
+    context.fillText("Test states[3] - credits", 360, 150);
+
+    context.font = "24px Arial";
+    context.fillText("Made by Daniel Thibeault", 400, 200);
+
+     // Start Button
+    context.fillStyle = "#222222";
+    context.fillRect(startButtonX, startButtonY, startButtonW, startButtonH);
+    context.fillStyle = "#ffffff";
+    context.font = "30px Arial";
+    context.fillText("START", startButtonX + 55, startButtonY + 45);
+}
+
+states[4] = function()
+{
+    // you lose
+    context.fillStyle = "#b700f4";
+    context.font = "30px Arial";
+    context.fillText("Test states[4] - you lose", 360, 150);
+
+    context.font = "24px Arial";
+    context.fillText("You Lose", 400, 250);
+
+    context.fillStyle = "#ffffff";
+    context.font = "30px Arial";
+    context.fillText("START", startButtonX + 55, startButtonY + 45);
 }
 
 function wasd()
@@ -157,9 +326,10 @@ function makeTopTargets()
         topTargets.push(target);
     }
 }
+
 function makeRightTargets()
 {
-      for(var i = 0; i < numTargets; i++)
+    for(var i = 0; i < numTargets; i++)
     {
         var target = new gameObject(canvas.width, rand(0, canvas.height), 20, 20, "#000000");
 
@@ -169,6 +339,7 @@ function makeRightTargets()
         rightTargets.push(target);
     }
 }
+
 function makeBottomTargets()
 {
     for(var i = 0; i < numTargets; i++)
@@ -182,10 +353,8 @@ function makeBottomTargets()
     }
 }
 
-
 function drawTargets()
 {
-    // LEFT TARGETS
     for(var i = 0; i < leftTargets.length; i++)
     {
         leftTargets[i].move();
@@ -205,7 +374,6 @@ function drawTargets()
         }
     }
 
-    // TOP TARGETS
     for(var i = 0; i < topTargets.length; i++)
     {
         topTargets[i].move();
@@ -224,13 +392,13 @@ function drawTargets()
             topTargets.push(target);
         }
     }
-    // RIGHT TARGETS
+
     for(var i = 0; i < rightTargets.length; i++)
     {
         rightTargets[i].move();
         rightTargets[i].drawCircle();
 
-        if(rightTargets[i].x  <= 0)
+        if(rightTargets[i].x <= 0)
         {
             rightTargets.splice(i, 1);
             i--;
@@ -243,7 +411,7 @@ function drawTargets()
             rightTargets.push(target);
         }
     }
-    // BOTTOM TARGETS
+
     for(var i = 0; i < bottomTargets.length; i++)
     {
         bottomTargets[i].move();
@@ -256,7 +424,6 @@ function drawTargets()
 
             var target = new gameObject(rand(0, canvas.width), canvas.height, 20, 20, "#000000");
 
-            
             target.vx = 0;
             target.vy = -rand(2, 4);
 
@@ -265,9 +432,103 @@ function drawTargets()
     }
 }
 
-function hitTargets()
+function hitPlayer()
 {
     // LEFT TARGETS
+    for(var i = 0; i < leftTargets.length; i++)
+    {
+        if(player.hitTestObject(leftTargets[i]))
+        {
+            hit++;
+            player.width += 10;
+            player.height += 10;
+
+            leftTargets.splice(i, 1);
+            i--;
+
+            var target = new gameObject(10, rand(0, canvas.height), 20, 20, "#000000");
+
+            target.vx = rand(2, 4);
+            target.vy = 0;
+
+            leftTargets.push(target);
+
+            console.log("player hit left target");
+        }
+    }
+
+    // TOP TARGETS
+    for(var i = 0; i < topTargets.length; i++)
+    {
+        if(player.hitTestObject(topTargets[i]))
+        {
+            hit++;
+            player.width += 10;
+            player.height += 10;
+
+            topTargets.splice(i, 1);
+            i--;
+
+            var target = new gameObject(rand(0, canvas.width), 10, 20, 20, "#000000");
+
+            target.vx = 0;
+            target.vy = rand(2, 4);
+
+            topTargets.push(target);
+
+            console.log("player hit top target");
+        }
+    }
+
+    // RIGHT TARGETS
+    for(var i = 0; i < rightTargets.length; i++)
+    {
+        if(player.hitTestObject(rightTargets[i]))
+        {
+            hit++;
+            player.width += 10;
+            player.height += 10;
+
+            rightTargets.splice(i, 1);
+            i--;
+
+            var target = new gameObject(canvas.width, rand(0, canvas.height), 20, 20, "#000000");
+
+            target.vx = -rand(2, 4);
+            target.vy = 0;
+
+            rightTargets.push(target);
+
+            console.log("player hit right target");
+        }
+    }
+
+    // BOTTOM TARGETS
+    for(var i = 0; i < bottomTargets.length; i++)
+    {
+        if(player.hitTestObject(bottomTargets[i]))
+        {
+            hit++;
+            player.width += 10;
+            player.height += 10;
+
+            bottomTargets.splice(i, 1);
+            i--;
+
+            var target = new gameObject(rand(0, canvas.width), canvas.height, 20, 20, "#000000");
+
+            target.vx = 0;
+            target.vy = -rand(2, 4);
+
+            bottomTargets.push(target);
+
+            console.log("player hit bottom target");
+        }
+    }
+}
+
+function hitTargets()
+{
     for(var i = 0; i < bullets.length; i++)
     {
         for(var j = 0; j < leftTargets.length; j++)
@@ -293,7 +554,6 @@ function hitTargets()
         }
     }
 
-    // TOP TARGETS
     for(var i = 0; i < bullets.length; i++)
     {
         for(var j = 0; j < topTargets.length; j++)
@@ -318,14 +578,15 @@ function hitTargets()
             }
         }
     }
-    // RIGHT TARGETS
+
     for(var i = 0; i < bullets.length; i++)
     {
-        for(var j = 0; j < leftTargets.length; j++)
+        for(var j = 0; j < rightTargets.length; j++)
         {
             if(bullets[i].hitTestObject(rightTargets[j]))
             {
                 score++;
+
                 bullets.splice(i, 1);
                 rightTargets.splice(j, 1);
 
@@ -342,7 +603,7 @@ function hitTargets()
             }
         }
     }
-    // BOTTOM TARGETS
+
     for(var i = 0; i < bullets.length; i++)
     {
         for(var j = 0; j < bottomTargets.length; j++)
@@ -350,6 +611,7 @@ function hitTargets()
             if(bullets[i].hitTestObject(bottomTargets[j]))
             {
                 score++;
+
                 bullets.splice(i, 1);
                 bottomTargets.splice(j, 1);
 
@@ -359,6 +621,7 @@ function hitTargets()
 
                 target.vx = 0;
                 target.vy = -rand(2, 4);
+
                 bottomTargets.push(target);
 
                 break;
