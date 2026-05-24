@@ -6,6 +6,7 @@ var interval = 1000/60;
 var timer = setInterval(animate, interval);
 var score = 0;
 var hit = 0;
+var canBeHIt = true;
 
 var states = [];
 var currentState = 0;
@@ -166,8 +167,11 @@ states[1] = function()
     pointer.drawTriangle();
     player.move();
 
-    if(hit == 55)
+    if(hit === 50)
     {
+        canBeHIt = false;
+        player.width = 100;
+        player.height = 100;
         currentState = 4;
     }
 }
@@ -432,7 +436,7 @@ function drawTargets()
     }
 }
 
-function hitPlayer()
+function hitPlayer(canBeHIt = true)
 {
     // LEFT TARGETS
     for(var i = 0; i < leftTargets.length; i++)
