@@ -12,7 +12,7 @@ var states = [];
 var currentState = 0;
 // 0 title
 // 1 game
-// 2 controls
+// 2 instructions
 // 3 credits
 // 4 lose
 // 5 win
@@ -28,7 +28,7 @@ var startButtonY = 250;
 var startButtonW = 200;
 var startButtonH = 70;
 
-// Controls Button
+// Instructions Button
 var controlsButtonX = 412;
 var controlsButtonY = 340;
 var controlsButtonW = 200;
@@ -67,7 +67,7 @@ function onClicked(e)
 
     if(currentState == 0 || currentState == 2 || currentState == 3 || currentState == 4 || currentState == 5)
     {
-        // Controls Button
+        // Instructions Button
         if(
             mouseX >= controlsButtonX &&
             mouseX <= controlsButtonX + controlsButtonW &&
@@ -75,7 +75,7 @@ function onClicked(e)
             mouseY <= controlsButtonY + controlsButtonH
         )
         {
-            console.log("Clicked Controls Button!");
+            console.log("Clicked Instructions Button!");
             currentState = 2;
         }
 
@@ -169,29 +169,7 @@ states[0] = function()
     context.font = "30px Arial";
     context.fillText("Asteriods, but....", 360, 100);
 
-    // Start Button
-    context.fillStyle = "#222222";
-    context.fillRect(startButtonX, startButtonY, startButtonW, startButtonH);
-
-    context.fillStyle = "#ffffff";
-    context.font = "30px Arial";
-    context.fillText("START", startButtonX + 55, startButtonY + 45);
-
-    // Controls Button
-    context.fillStyle = "#222222";
-    context.fillRect(controlsButtonX, controlsButtonY, controlsButtonW, controlsButtonH);
-
-    context.fillStyle = "#ffffff";
-    context.font = "30px Arial";
-    context.fillText("CONTROLS", controlsButtonX + 22, controlsButtonY + 45);
-
-    // Credits Button
-    context.fillStyle = "#222222";
-    context.fillRect(creditsButtonX, creditsButtonY, creditsButtonW, creditsButtonH);
-
-    context.fillStyle = "#ffffff";
-    context.font = "30px Arial";
-    context.fillText("CREDITS", creditsButtonX + 35, creditsButtonY + 45);
+    drawMenuButtons();
 }
 
 states[1] = function()
@@ -256,14 +234,14 @@ states[1] = function()
 
 states[2] = function()
 {
-    // Controls
+    // Instructions
+
     context.fillStyle = "#b700f4";
     context.font = "24px Arial";
-    context.fillText("WASD to move",400,150);
+    context.fillText("WASD to move", 400, 150);
     context.fillText("SPACE to shoot", 400, 180);
-    context.fillText("If you grow to big, you lose", 400, 210);
+    context.fillText("If you grow too big, you lose", 400, 210);
     context.fillText("200 Points to win", 400, 240);
-
 
     drawMenuButtons();
 }
@@ -271,6 +249,7 @@ states[2] = function()
 states[3] = function()
 {
     // Credits
+
     context.fillStyle = "#b700f4";
     context.font = "24px Arial";
     context.fillText("Made by Daniel Thibeault", 400, 200);
@@ -281,6 +260,7 @@ states[3] = function()
 states[4] = function()
 {
     // you lose
+
     context.fillStyle = "#b700f4";
     context.font = "24px Arial";
     context.fillText("You Lose", 400, 200);
@@ -291,6 +271,7 @@ states[4] = function()
 states[5] = function()
 {
     // you win
+
     context.fillStyle = "#b700f4";
     context.font = "24px Arial";
     context.fillText("You Win", 400, 200);
@@ -308,13 +289,13 @@ function drawMenuButtons()
     context.font = "30px Arial";
     context.fillText("START", startButtonX + 55, startButtonY + 45);
 
-    // Controls Button
+    // Instructions Button
     context.fillStyle = "#222222";
     context.fillRect(controlsButtonX, controlsButtonY, controlsButtonW, controlsButtonH);
 
     context.fillStyle = "#ffffff";
     context.font = "30px Arial";
-    context.fillText("CONTROLS", controlsButtonX + 22, controlsButtonY + 45);
+    context.fillText("INSTRUCTIONS", controlsButtonX + 4, controlsButtonY + 45);
 
     // Credits Button
     context.fillStyle = "#222222";
