@@ -19,6 +19,7 @@ var currentState = 0;
 // the power up
 var gameStartTime = 0;
 var showAfter30Seconds = false;
+var hasUpgrade = false;
 
 // Start Button
 var startButtonX = 412;
@@ -58,13 +59,20 @@ function onClicked(e)
         )
         {
             console.log("Clicked Start Button!");
+
             currentState = 1;
-             currentState = 1;
-             gameStartTime = Date.now();
-             showAfter30Seconds = false;
+            gameStartTime = Date.now();
+            showAfter30Seconds = false;
+            hasUpgrade = false;
+
+            upgrade.x = -20;
+            upgrade.y = -20;
+            upgrade.vx = 1;
+            upgrade.vy = 1;
+            upgrade.color = "#0000ff";
         }
     }
-    // there might be a better way but fuck it
+
     if(currentState == 0 || currentState == 2 || currentState == 3 || currentState == 4)
     {
         // Controls Button
@@ -95,6 +103,12 @@ function onClicked(e)
 
 var player = new gameObject(canvas.width/2, canvas.height/2, 75, 75, "#ff0000");
 var pointer = new gameObject(450, 450, 50, 100);
+var upgradePointer = new gameObject(450, 450, 50, 100, "#00ffff");
+
+// Upgrade ball
+var upgrade = new gameObject(-20, -20, 40, 40, "#0000ff");
+upgrade.vx = 1;
+upgrade.vy = 1;
 
 var frictionX = .9;
 var frictionY = .9;
@@ -128,7 +142,6 @@ states[0] = function()
     context.font = "30px Arial";
     context.fillText("Asteriods, but....", 360, 100);
     context.fillText("Test states[0] - title", 360, 150);
-
 
     // Start Button
     context.fillStyle = "#222222";
@@ -166,38 +179,40 @@ states[1] = function()
 
     context.fillText("Test states[1] - game", 400, 100);
 
-    if(Date.now() - gameStartTime >= 30000)
-    {
-        showAfter30Seconds = true;
-    }
+    var gameTime = Date.now() - gameStartTime;
 
-    if(showAfter30Seconds)
+    if(gameTime >= 30000 && gameTime <= 35000)
     {
         context.fillStyle = pointer.color;
         context.font = "40px Arial";
         context.fillText("30 seconds passed!", 330, 200);
         console.log("30 secs");
+    }
 
-            if(gameStartTime >= 40000)
-            {
-                context.fillStyle = "#ffffff";
-                context.font = "43px Arial";
-                context.fillText("30 seconds passed!", 330, 200);
-                console.log("40 secs");
-
-            }
+    if(gameTime >= 30000 && hasUpgrade == false)
+    {
+        upgrade.move();
+        upgrade.drawCircle();
     }
 
     orbit();
     wasd();
     shoot();
+    upgradeShoot();
     moveBullets();
     drawTargets();
     hitTargets();
     hitPlayer();
+    hitUpgrade();
 
     player.drawCircle();
     pointer.drawTriangle();
+
+    if(hasUpgrade)
+    {
+        upgradePointer.drawTriangle();
+    }
+
     player.move();
 
     if(hit >= 70)
@@ -219,8 +234,6 @@ states[2] = function()
     context.font = "24px Arial";
     context.fillText("WASD to move", 400, 180);
     context.fillText("SPACE to shoot", 400, 210);
-    context.fillStyle = "#b700f4";
-    context.font = "30px Arial";
 
     // Start Button
     context.fillStyle = "#222222";
@@ -265,7 +278,7 @@ states[3] = function()
     context.font = "30px Arial";
     context.fillText("START", startButtonX + 55, startButtonY + 45);
 
-      // Controls Button
+    // Controls Button
     context.fillStyle = "#222222";
     context.fillRect(controlsButtonX, controlsButtonY, controlsButtonW, controlsButtonH);
 
@@ -343,9 +356,13 @@ function orbit()
 
     pointer.x = player.x + player.width / 2 * Math.cos(orbitAngle);
     pointer.y = player.y + player.width / 2 * Math.sin(orbitAngle);
+    pointer.angle = orbitAngle * 180 / Math.PI;
+
+    upgradePointer.x = player.x + player.width / 2 * Math.cos(orbitAngle + Math.PI);
+    upgradePointer.y = player.y + player.width / 2 * Math.sin(orbitAngle + Math.PI);
+    upgradePointer.angle = (orbitAngle + Math.PI) * 180 / Math.PI;
 
     orbitAngle += speed;
-    pointer.angle = orbitAngle * 180 / Math.PI;
 }
 
 function shoot()
@@ -370,6 +387,24 @@ function shoot()
     if(!spaceBar)
     {
         canShoot = true;
+    }
+}
+
+function upgradeShoot()
+{
+    if(hasUpgrade)
+    {
+        var radians = upgradePointer.angle * Math.PI / 180;
+
+        var tipX = upgradePointer.x + Math.cos(radians) * (upgradePointer.width / 2);
+        var tipY = upgradePointer.y + Math.sin(radians) * (upgradePointer.width / 2);
+
+        var bullet = new gameObject(tipX, tipY, 10, 10, "#00ffff");
+
+        bullet.vx = Math.cos(radians) * 8;
+        bullet.vy = Math.sin(radians) * 8;
+
+        bullets.push(bullet);
     }
 }
 
@@ -744,5 +779,15 @@ function hitTargets()
                 break;
             }
         }
+    }
+}
+
+function hitUpgrade()
+{
+    if(player.hitTestObject(upgrade))
+    {
+        hasUpgrade = true;
+        upgrade.color = "#ffffff";
+        console.log("upgraded");
     }
 }
