@@ -15,6 +15,7 @@ var currentState = 0;
 // 2 controls
 // 3 credits
 // 4 lose
+// 5 win
 
 // the power up
 var gameStartTime = 0;
@@ -59,21 +60,12 @@ function onClicked(e)
         )
         {
             console.log("Clicked Start Button!");
-
+            resetGame();
             currentState = 1;
-            gameStartTime = Date.now();
-            showAfter30Seconds = false;
-            hasUpgrade = false;
-
-            upgrade.x = -20;
-            upgrade.y = -20;
-            upgrade.vx = 1;
-            upgrade.vy = 1;
-            upgrade.color = "#0000ff";
         }
     }
 
-    if(currentState == 0 || currentState == 2 || currentState == 3 || currentState == 4)
+    if(currentState == 0 || currentState == 2 || currentState == 3 || currentState == 4 || currentState == 5)
     {
         // Controls Button
         if(
@@ -127,6 +119,41 @@ makeBottomTargets();
 var canShoot = true;
 var bullets = [];
 
+function resetGame()
+{
+    score = 0;
+    hit = 0;
+    canBeHit = true;
+    hasUpgrade = false;
+    showAfter30Seconds = false;
+    gameStartTime = Date.now();
+
+    player.x = canvas.width/2;
+    player.y = canvas.height/2;
+    player.width = 75;
+    player.height = 75;
+    player.vx = 0;
+    player.vy = 0;
+
+    bullets = [];
+
+    leftTargets = [];
+    topTargets = [];
+    rightTargets = [];
+    bottomTargets = [];
+
+    makeLeftTargets();
+    makeTopTargets();
+    makeRightTargets();
+    makeBottomTargets();
+
+    upgrade.x = -20;
+    upgrade.y = -20;
+    upgrade.vx = 1;
+    upgrade.vy = 1;
+    upgrade.color = "#0000ff";
+}
+
 function animate()
 {
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -141,7 +168,6 @@ states[0] = function()
     context.fillStyle = "#b700f4";
     context.font = "30px Arial";
     context.fillText("Asteriods, but....", 360, 100);
-    context.fillText("Test states[0] - title", 360, 150);
 
     // Start Button
     context.fillStyle = "#222222";
@@ -177,8 +203,6 @@ states[1] = function()
     context.fillText("Score: " + score, 400, 50);
     context.fillText("Hit: " + hit, 550, 50);
 
-    context.fillText("Test states[1] - game", 400, 100);
-
     var gameTime = Date.now() - gameStartTime;
 
     if(gameTime >= 30000 && gameTime <= 35000)
@@ -186,7 +210,6 @@ states[1] = function()
         context.fillStyle = pointer.color;
         context.font = "40px Arial";
         context.fillText("30 seconds passed!", 330, 200);
-        console.log("30 secs");
     }
 
     if(gameTime >= 30000 && hasUpgrade == false)
@@ -215,7 +238,14 @@ states[1] = function()
 
     player.move();
 
-    if(hit >= 70)
+    if(hit >= 70 && score >= 200)
+    {
+        canBeHit = false;
+        player.width = 100;
+        player.height = 100;
+        currentState = 5;
+    }
+    else if(hit >= 70)
     {
         canBeHit = false;
         player.width = 100;
@@ -228,75 +258,48 @@ states[2] = function()
 {
     // Controls
     context.fillStyle = "#b700f4";
-    context.font = "30px Arial";
-    context.fillText("Test states[2] - controls", 360, 150);
-
     context.font = "24px Arial";
-    context.fillText("WASD to move", 400, 180);
-    context.fillText("SPACE to shoot", 400, 210);
+    context.fillText("WASD to move",400,150);
+    context.fillText("SPACE to shoot", 400, 180);
+    context.fillText("If you grow to big, you lose", 400, 210);
+    context.fillText("200 Points to win", 400, 240);
 
-    // Start Button
-    context.fillStyle = "#222222";
-    context.fillRect(startButtonX, startButtonY, startButtonW, startButtonH);
 
-    context.fillStyle = "#ffffff";
-    context.font = "30px Arial";
-    context.fillText("START", startButtonX + 55, startButtonY + 45);
-
-    // Controls Button
-    context.fillStyle = "#222222";
-    context.fillRect(controlsButtonX, controlsButtonY, controlsButtonW, controlsButtonH);
-
-    context.fillStyle = "#ffffff";
-    context.font = "30px Arial";
-    context.fillText("CONTROLS", controlsButtonX + 22, controlsButtonY + 45);
-
-    // Credits Button
-    context.fillStyle = "#222222";
-    context.fillRect(creditsButtonX, creditsButtonY, creditsButtonW, creditsButtonH);
-
-    context.fillStyle = "#ffffff";
-    context.font = "30px Arial";
-    context.fillText("CREDITS", creditsButtonX + 35, creditsButtonY + 45);
+    drawMenuButtons();
 }
 
 states[3] = function()
 {
     // Credits
     context.fillStyle = "#b700f4";
-    context.font = "30px Arial";
-    context.fillText("Test states[3] - credits", 360, 150);
-
     context.font = "24px Arial";
     context.fillText("Made by Daniel Thibeault", 400, 200);
 
-    // Start Button
-    context.fillStyle = "#222222";
-    context.fillRect(startButtonX, startButtonY, startButtonW, startButtonH);
-
-    context.fillStyle = "#ffffff";
-    context.font = "30px Arial";
-    context.fillText("START", startButtonX + 55, startButtonY + 45);
-
-    // Controls Button
-    context.fillStyle = "#222222";
-    context.fillRect(controlsButtonX, controlsButtonY, controlsButtonW, controlsButtonH);
-
-    context.fillStyle = "#ffffff";
-    context.font = "30px Arial";
-    context.fillText("CONTROLS", controlsButtonX + 22, controlsButtonY + 45);
+    drawMenuButtons();
 }
 
 states[4] = function()
 {
     // you lose
     context.fillStyle = "#b700f4";
-    context.font = "30px Arial";
-    context.fillText("Test states[4] - you lose", 360, 100);
-
     context.font = "24px Arial";
     context.fillText("You Lose", 400, 200);
 
+    drawMenuButtons();
+}
+
+states[5] = function()
+{
+    // you win
+    context.fillStyle = "#b700f4";
+    context.font = "24px Arial";
+    context.fillText("You Win", 400, 200);
+
+    drawMenuButtons();
+}
+
+function drawMenuButtons()
+{
     // Start Button
     context.fillStyle = "#222222";
     context.fillRect(startButtonX, startButtonY, startButtonW, startButtonH);
@@ -493,10 +496,8 @@ function drawTargets()
             i--;
 
             var target = new gameObject(10, rand(0, canvas.height), 20, 20, "#000000");
-
             target.vx = rand(2, 4);
             target.vy = 0;
-
             leftTargets.push(target);
         }
     }
@@ -512,10 +513,8 @@ function drawTargets()
             i--;
 
             var target = new gameObject(rand(0, canvas.width), 10, 20, 20, "#000000");
-
             target.vx = 0;
             target.vy = rand(2, 4);
-
             topTargets.push(target);
         }
     }
@@ -531,10 +530,8 @@ function drawTargets()
             i--;
 
             var target = new gameObject(canvas.width, rand(0, canvas.height), 20, 20, "#000000");
-
             target.vx = -rand(2, 4);
             target.vy = 0;
-
             rightTargets.push(target);
         }
     }
@@ -550,10 +547,8 @@ function drawTargets()
             i--;
 
             var target = new gameObject(rand(0, canvas.width), canvas.height, 20, 20, "#000000");
-
             target.vx = 0;
             target.vy = -rand(2, 4);
-
             bottomTargets.push(target);
         }
     }
@@ -566,86 +561,50 @@ function hitPlayer()
         return;
     }
 
-    // LEFT TARGETS
     for(var i = 0; i < leftTargets.length; i++)
     {
         if(player.hitTestObject(leftTargets[i]))
         {
             playerGotHit();
-
             leftTargets.splice(i, 1);
-            i--;
-
-            var target = new gameObject(10, rand(0, canvas.height), 20, 20, "#000000");
-
-            target.vx = rand(2, 4);
-            target.vy = 0;
-
-            leftTargets.push(target);
-
+            leftTargets.push(new gameObject(10, rand(0, canvas.height), 20, 20, "#000000"));
+            leftTargets[leftTargets.length - 1].vx = rand(2, 4);
             return;
         }
     }
 
-    // TOP TARGETS
     for(var i = 0; i < topTargets.length; i++)
     {
         if(player.hitTestObject(topTargets[i]))
         {
             playerGotHit();
-
             topTargets.splice(i, 1);
-            i--;
-
-            var target = new gameObject(rand(0, canvas.width), 10, 20, 20, "#000000");
-
-            target.vx = 0;
-            target.vy = rand(2, 4);
-
-            topTargets.push(target);
-
+            topTargets.push(new gameObject(rand(0, canvas.width), 10, 20, 20, "#000000"));
+            topTargets[topTargets.length - 1].vy = rand(2, 4);
             return;
         }
     }
 
-    // RIGHT TARGETS
     for(var i = 0; i < rightTargets.length; i++)
     {
         if(player.hitTestObject(rightTargets[i]))
         {
             playerGotHit();
-
             rightTargets.splice(i, 1);
-            i--;
-
-            var target = new gameObject(canvas.width, rand(0, canvas.height), 20, 20, "#000000");
-
-            target.vx = -rand(2, 4);
-            target.vy = 0;
-
-            rightTargets.push(target);
-
+            rightTargets.push(new gameObject(canvas.width, rand(0, canvas.height), 20, 20, "#000000"));
+            rightTargets[rightTargets.length - 1].vx = -rand(2, 4);
             return;
         }
     }
 
-    // BOTTOM TARGETS
     for(var i = 0; i < bottomTargets.length; i++)
     {
         if(player.hitTestObject(bottomTargets[i]))
         {
             playerGotHit();
-
             bottomTargets.splice(i, 1);
-            i--;
-
-            var target = new gameObject(rand(0, canvas.width), canvas.height, 20, 20, "#000000");
-
-            target.vx = 0;
-            target.vy = -rand(2, 4);
-
-            bottomTargets.push(target);
-
+            bottomTargets.push(new gameObject(rand(0, canvas.width), canvas.height, 20, 20, "#000000"));
+            bottomTargets[bottomTargets.length - 1].vy = -rand(2, 4);
             return;
         }
     }
@@ -668,14 +627,6 @@ function playerGotHit()
         player.height = 1000;
     }
 
-    if(hit >= 100)
-    {
-        canBeHit = false;
-        player.width = 100;
-        player.height = 100;
-        currentState = 4;
-    }
-
     console.log(hit);
 }
 
@@ -688,17 +639,13 @@ function hitTargets()
             if(bullets[i].hitTestObject(leftTargets[j]))
             {
                 score++;
-
                 bullets.splice(i, 1);
                 leftTargets.splice(j, 1);
-
                 i--;
 
                 var target = new gameObject(10, rand(0, canvas.height), 20, 20, "#000000");
-
                 target.vx = rand(2, 4);
                 target.vy = 0;
-
                 leftTargets.push(target);
 
                 break;
@@ -713,17 +660,13 @@ function hitTargets()
             if(bullets[i].hitTestObject(topTargets[j]))
             {
                 score++;
-
                 bullets.splice(i, 1);
                 topTargets.splice(j, 1);
-
                 i--;
 
                 var target = new gameObject(rand(0, canvas.width), 10, 20, 20, "#000000");
-
                 target.vx = 0;
                 target.vy = rand(2, 4);
-
                 topTargets.push(target);
 
                 break;
@@ -738,17 +681,13 @@ function hitTargets()
             if(bullets[i].hitTestObject(rightTargets[j]))
             {
                 score++;
-
                 bullets.splice(i, 1);
                 rightTargets.splice(j, 1);
-
                 i--;
 
                 var target = new gameObject(canvas.width, rand(0, canvas.height), 20, 20, "#000000");
-
                 target.vx = -rand(2, 4);
                 target.vy = 0;
-
                 rightTargets.push(target);
 
                 break;
@@ -763,17 +702,13 @@ function hitTargets()
             if(bullets[i].hitTestObject(bottomTargets[j]))
             {
                 score++;
-
                 bullets.splice(i, 1);
                 bottomTargets.splice(j, 1);
-
                 i--;
 
                 var target = new gameObject(rand(0, canvas.width), canvas.height, 20, 20, "#000000");
-
                 target.vx = 0;
                 target.vy = -rand(2, 4);
-
                 bottomTargets.push(target);
 
                 break;
