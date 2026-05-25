@@ -6,7 +6,7 @@ var interval = 1000/60;
 var timer = setInterval(animate, interval);
 var score = 0;
 var hit = 0;
-var canBeHIt = true;
+var canBeHit = true;
 
 var states = [];
 var currentState = 0;
@@ -15,6 +15,10 @@ var currentState = 0;
 // 2 controls
 // 3 credits
 // 4 lose
+
+// the power up
+var gameStartTime = 0;
+var showAfter30Seconds = false;
 
 // Start Button
 var startButtonX = 412;
@@ -43,7 +47,7 @@ function onClicked(e)
     var mouseX = e.clientX - rect.left;
     var mouseY = e.clientY - rect.top;
 
-    if(currentState >=0 || currentState <= 2) // state[1] = game
+    if(currentState != 1)
     {
         // Start Button
         if(
@@ -55,8 +59,14 @@ function onClicked(e)
         {
             console.log("Clicked Start Button!");
             currentState = 1;
+             currentState = 1;
+             gameStartTime = Date.now();
+             showAfter30Seconds = false;
         }
-
+    }
+    // there might be a better way but fuck it
+    if(currentState == 0 || currentState == 2 || currentState == 3 || currentState == 4)
+    {
         // Controls Button
         if(
             mouseX >= controlsButtonX &&
@@ -116,7 +126,9 @@ states[0] = function()
 
     context.fillStyle = "#b700f4";
     context.font = "30px Arial";
+    context.fillText("Asteriods, but....", 360, 100);
     context.fillText("Test states[0] - title", 360, 150);
+
 
     // Start Button
     context.fillStyle = "#222222";
@@ -151,9 +163,30 @@ states[1] = function()
     context.font = "30px Arial";
     context.fillText("Score: " + score, 400, 50);
     context.fillText("Hit: " + hit, 550, 50);
-    console.log(hit)
 
     context.fillText("Test states[1] - game", 400, 100);
+
+    if(Date.now() - gameStartTime >= 30000)
+    {
+        showAfter30Seconds = true;
+    }
+
+    if(showAfter30Seconds)
+    {
+        context.fillStyle = pointer.color;
+        context.font = "40px Arial";
+        context.fillText("30 seconds passed!", 330, 200);
+        console.log("30 secs");
+
+            if(gameStartTime >= 40000)
+            {
+                context.fillStyle = "#ffffff";
+                context.font = "43px Arial";
+                context.fillText("30 seconds passed!", 330, 200);
+                console.log("40 secs");
+
+            }
+    }
 
     orbit();
     wasd();
@@ -167,9 +200,9 @@ states[1] = function()
     pointer.drawTriangle();
     player.move();
 
-    if(hit === 50)
+    if(hit >= 70)
     {
-        canBeHIt = false;
+        canBeHit = false;
         player.width = 100;
         player.height = 100;
         currentState = 4;
@@ -184,8 +217,34 @@ states[2] = function()
     context.fillText("Test states[2] - controls", 360, 150);
 
     context.font = "24px Arial";
-    context.fillText("WASD to move", 400, 250);
-    context.fillText("SPACE to shoot", 400, 300);
+    context.fillText("WASD to move", 400, 180);
+    context.fillText("SPACE to shoot", 400, 210);
+    context.fillStyle = "#b700f4";
+    context.font = "30px Arial";
+
+    // Start Button
+    context.fillStyle = "#222222";
+    context.fillRect(startButtonX, startButtonY, startButtonW, startButtonH);
+
+    context.fillStyle = "#ffffff";
+    context.font = "30px Arial";
+    context.fillText("START", startButtonX + 55, startButtonY + 45);
+
+    // Controls Button
+    context.fillStyle = "#222222";
+    context.fillRect(controlsButtonX, controlsButtonY, controlsButtonW, controlsButtonH);
+
+    context.fillStyle = "#ffffff";
+    context.font = "30px Arial";
+    context.fillText("CONTROLS", controlsButtonX + 22, controlsButtonY + 45);
+
+    // Credits Button
+    context.fillStyle = "#222222";
+    context.fillRect(creditsButtonX, creditsButtonY, creditsButtonW, creditsButtonH);
+
+    context.fillStyle = "#ffffff";
+    context.font = "30px Arial";
+    context.fillText("CREDITS", creditsButtonX + 35, creditsButtonY + 45);
 }
 
 states[3] = function()
@@ -198,12 +257,21 @@ states[3] = function()
     context.font = "24px Arial";
     context.fillText("Made by Daniel Thibeault", 400, 200);
 
-     // Start Button
+    // Start Button
     context.fillStyle = "#222222";
     context.fillRect(startButtonX, startButtonY, startButtonW, startButtonH);
+
     context.fillStyle = "#ffffff";
     context.font = "30px Arial";
     context.fillText("START", startButtonX + 55, startButtonY + 45);
+
+      // Controls Button
+    context.fillStyle = "#222222";
+    context.fillRect(controlsButtonX, controlsButtonY, controlsButtonW, controlsButtonH);
+
+    context.fillStyle = "#ffffff";
+    context.font = "30px Arial";
+    context.fillText("CONTROLS", controlsButtonX + 22, controlsButtonY + 45);
 }
 
 states[4] = function()
@@ -211,14 +279,34 @@ states[4] = function()
     // you lose
     context.fillStyle = "#b700f4";
     context.font = "30px Arial";
-    context.fillText("Test states[4] - you lose", 360, 150);
+    context.fillText("Test states[4] - you lose", 360, 100);
 
     context.font = "24px Arial";
-    context.fillText("You Lose", 400, 250);
+    context.fillText("You Lose", 400, 200);
+
+    // Start Button
+    context.fillStyle = "#222222";
+    context.fillRect(startButtonX, startButtonY, startButtonW, startButtonH);
 
     context.fillStyle = "#ffffff";
     context.font = "30px Arial";
     context.fillText("START", startButtonX + 55, startButtonY + 45);
+
+    // Controls Button
+    context.fillStyle = "#222222";
+    context.fillRect(controlsButtonX, controlsButtonY, controlsButtonW, controlsButtonH);
+
+    context.fillStyle = "#ffffff";
+    context.font = "30px Arial";
+    context.fillText("CONTROLS", controlsButtonX + 22, controlsButtonY + 45);
+
+    // Credits Button
+    context.fillStyle = "#222222";
+    context.fillRect(creditsButtonX, creditsButtonY, creditsButtonW, creditsButtonH);
+
+    context.fillStyle = "#ffffff";
+    context.font = "30px Arial";
+    context.fillText("CREDITS", creditsButtonX + 35, creditsButtonY + 45);
 }
 
 function wasd()
@@ -436,16 +524,19 @@ function drawTargets()
     }
 }
 
-function hitPlayer(canBeHIt = true)
+function hitPlayer()
 {
+    if(canBeHit == false)
+    {
+        return;
+    }
+
     // LEFT TARGETS
     for(var i = 0; i < leftTargets.length; i++)
     {
         if(player.hitTestObject(leftTargets[i]))
         {
-            hit++;
-            player.width += 10;
-            player.height += 10;
+            playerGotHit();
 
             leftTargets.splice(i, 1);
             i--;
@@ -457,7 +548,7 @@ function hitPlayer(canBeHIt = true)
 
             leftTargets.push(target);
 
-            console.log("player hit left target");
+            return;
         }
     }
 
@@ -466,9 +557,7 @@ function hitPlayer(canBeHIt = true)
     {
         if(player.hitTestObject(topTargets[i]))
         {
-            hit++;
-            player.width += 10;
-            player.height += 10;
+            playerGotHit();
 
             topTargets.splice(i, 1);
             i--;
@@ -480,7 +569,7 @@ function hitPlayer(canBeHIt = true)
 
             topTargets.push(target);
 
-            console.log("player hit top target");
+            return;
         }
     }
 
@@ -489,9 +578,7 @@ function hitPlayer(canBeHIt = true)
     {
         if(player.hitTestObject(rightTargets[i]))
         {
-            hit++;
-            player.width += 10;
-            player.height += 10;
+            playerGotHit();
 
             rightTargets.splice(i, 1);
             i--;
@@ -503,7 +590,7 @@ function hitPlayer(canBeHIt = true)
 
             rightTargets.push(target);
 
-            console.log("player hit right target");
+            return;
         }
     }
 
@@ -512,9 +599,7 @@ function hitPlayer(canBeHIt = true)
     {
         if(player.hitTestObject(bottomTargets[i]))
         {
-            hit++;
-            player.width += 10;
-            player.height += 10;
+            playerGotHit();
 
             bottomTargets.splice(i, 1);
             i--;
@@ -526,9 +611,37 @@ function hitPlayer(canBeHIt = true)
 
             bottomTargets.push(target);
 
-            console.log("player hit bottom target");
+            return;
         }
     }
+}
+
+function playerGotHit()
+{
+    hit++;
+
+    player.width += 10;
+    player.height += 10;
+
+    if(player.width > 1000)
+    {
+        player.width = 1000;
+    }
+
+    if(player.height > 1000)
+    {
+        player.height = 1000;
+    }
+
+    if(hit >= 100)
+    {
+        canBeHit = false;
+        player.width = 100;
+        player.height = 100;
+        currentState = 4;
+    }
+
+    console.log(hit);
 }
 
 function hitTargets()
