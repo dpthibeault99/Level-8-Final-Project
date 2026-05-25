@@ -286,24 +286,24 @@ function drawMenuButtons()
     context.fillRect(startButtonX, startButtonY, startButtonW, startButtonH);
 
     context.fillStyle = "#ffffff";
-    context.font = "30px Arial";
-    context.fillText("START", startButtonX + 55, startButtonY + 45);
+    context.font = "24px Arial";
+    context.fillText("START", startButtonX + 65, startButtonY + 43);
 
     // Instructions Button
     context.fillStyle = "#222222";
     context.fillRect(controlsButtonX, controlsButtonY, controlsButtonW, controlsButtonH);
 
     context.fillStyle = "#ffffff";
-    context.font = "30px Arial";
-    context.fillText("INSTRUCTIONS", controlsButtonX + 4, controlsButtonY + 45);
+    context.font = "24px Arial";
+    context.fillText("INSTRUCTIONS", controlsButtonX + 15, controlsButtonY + 43);
 
     // Credits Button
     context.fillStyle = "#222222";
     context.fillRect(creditsButtonX, creditsButtonY, creditsButtonW, creditsButtonH);
 
     context.fillStyle = "#ffffff";
-    context.font = "30px Arial";
-    context.fillText("CREDITS", creditsButtonX + 35, creditsButtonY + 45);
+    context.font = "24px Arial";
+    context.fillText("CREDITS", creditsButtonX + 55, creditsButtonY + 43);
 }
 
 function wasd()
